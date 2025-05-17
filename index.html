@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Est Shipping Cost Lookup</title>
+  <style>
+    body { font-family: sans-serif; padding: 2rem; }
+    input, button { font-size: 1rem; padding: 0.5rem; }
+    #output { margin-top: 1rem; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>Shipping Cost Lookup</h1>
+  <input id="sku" placeholder="Enter SKU" />
+  <button id="go">Go</button>
+  <div id="output"></div>
+
+  <script>
+  let data = {};
+  fetch('sku_to_cost.json')
+    .then(r => r.json())
+    .then(j => data = j)
+    .catch(err => {
+      document.getElementById('output').textContent =
+        'Error loading data: ' + err;
+    });
+
+  document.getElementById('go').onclick = () => {
+    const raw = document.getElementById('sku').value.trim().toUpperCase();
+    const out = document.getElementById('output');
+    if (!raw) {
+      out.textContent = 'Please enter a SKU.';
+      return;
+    }
+    if (!(raw in data)) {
+      out.textContent = `SKU "${raw}" not found.`;
+      return;
+    }
+    const cost = data[raw];
+    out.textContent = 
+      cost===null
+        ? `No bracket defined for SKU "${raw}".`
+        : `Estimated shipping cost for ${raw}: $${cost.toFixed(2)}`;
+  };
+  </script>
+</body>
+</html>
